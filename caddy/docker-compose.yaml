@@ -18,4 +18,6 @@ services:
       - caddy_config:/config
     networks: [reverse-proxy]
 
-volumes: { caddy_data:, caddy_config: }
+volumes:
+  caddy_data: {}
+  caddy_config: {}
