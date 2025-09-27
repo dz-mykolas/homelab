@@ -1,3 +1,5 @@
+version: "3.9"
+
 networks:
   reverse-proxy:
     external: true
@@ -18,18 +20,6 @@ services:
     image: ghcr.io/goauthentik/server:latest
     restart: unless-stopped
     command: server
-
-    # CURL is not installed for now, 
-    # find a way to install it and 
-    # then uncomment the healthcheck
-    # healthcheck:
-    #     test: ["CMD-SHELL", "curl --fail https://auth.${MY_DOMAIN}/application/o/coder/ || exit 1"]
-    #     start_period: 5s
-    #     start_interval: 5s
-    #     interval: 10s
-    #     retries: 10
-    #     timeout: 5s
-
     environment:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:? Authentik secret key required}
 
@@ -40,40 +30,60 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__NAME: authentik
 
-      AUTHENTIK_ERROR_REPORTING__ENABLED: true
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
     volumes:
       - authentik_media:/media
       - authentik_templates:/templates
     ports:
       - "9000:9000"
       - "9443:9443"
-    networks: [reverse-proxy, auth-internal]
+    networks:
+      - reverse-proxy
+      - auth-internal
     depends_on:
       postgresql:
         condition: service_healthy
       redis:
         condition: service_healthy
+    # --- Healthcheck options (pick ONE) ---
+    # Option A: if you add curl to the image (see notes below)
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl --fail --silent https://auth.${MY_DOMAIN}/application/o/coder/ || exit 1"]
+    #   start_period: 5s
+    #   interval: 10s
+    #   retries: 10
+    #   timeout: 5s
+    #
+    # Option B: no curl required (uses Python to test TCP)
+    # healthcheck:
+    #   test: ["CMD-SHELL", "python - << 'PY'\nimport socket,sys\nh='127.0.0.1'; p=9443\ntry:\n  s=socket.create_connection((h,p),3); s.close()\nexcept Exception:\n  sys.exit(1)\nPY"]
+    #   start_period: 5s
+    #   interval: 10s
+    #   retries: 10
+    #   timeout: 5s
+
   authentik-worker:
     container_name: authentik-worker
     hostname: authentik-worker
     image: ghcr.io/goauthentik/server:latest
     restart: unless-stopped
     command: worker
+    user: root
     environment:
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?Authentik secret key required}
-      
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:? Authentik secret key required}
+
       AUTHENTIK_REDIS__HOST: redis
 
       AUTHENTIK_POSTGRESQL__HOST: postgresql
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:?Authentik database password required}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:? Authentik database password required}
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__NAME: authentik
-    user: root
     volumes:
       - authentik_media:/media
       - authentik_templates:/templates
       - authentik_certs:/certs
-    networks: [auth-internal]
+    networks:
+      - auth-internal
     depends_on:
       postgresql:
         condition: service_healthy
@@ -84,24 +94,25 @@ services:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
     healthcheck:
-    test: ["CMD", "redis-cli", "ping"]
-    interval: 10s
-    timeout: 3s
-    retries: 10
-    networks: [auth-internal]
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - auth-internal
 
   postgresql:
     image: postgres:16-alpine
     environment:
-    POSTGRES_DB: authentik
-    POSTGRES_USER: authentik
-    POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD}
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD}
     healthcheck:
-    test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
-    interval: 10s
-    timeout: 5s
-    retries: 10
+      test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     volumes:
-    - pgdata:/var/lib/postgresql/data
-    networks: [auth-internal]
-    
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - auth-internal
