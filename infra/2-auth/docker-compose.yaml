@@ -53,42 +53,42 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    authentik-worker:
-      container_name: authentik-worker
-      hostname: authentik-worker
-      image: ghcr.io/goauthentik/server:latest
-      restart: unless-stopped
-      command: worker
-      environment:
-        AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?Authentik secret key required}
-        
-        AUTHENTIK_REDIS__HOST: redis
+  authentik-worker:
+    container_name: authentik-worker
+    hostname: authentik-worker
+    image: ghcr.io/goauthentik/server:latest
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?Authentik secret key required}
+      
+      AUTHENTIK_REDIS__HOST: redis
 
-        AUTHENTIK_POSTGRESQL__HOST: postgresql
-        AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:?Authentik database password required}
-        AUTHENTIK_POSTGRESQL__USER: authentik
-        AUTHENTIK_POSTGRESQL__NAME: authentik
-      user: root
-      volumes:
-        - authentik_media:/media
-        - authentik_templates:/templates
-        - authentik_certs:/certs
-      networks: [auth-internal]
-      depends_on:
-        postgresql:
-          condition: service_healthy
-        redis:
-          condition: service_healthy
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:?Authentik database password required}
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+    user: root
+    volumes:
+      - authentik_media:/media
+      - authentik_templates:/templates
+      - authentik_certs:/certs
+    networks: [auth-internal]
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
-    redis:
-      image: redis:7-alpine
-      command: ["redis-server", "--appendonly", "yes"]
-      healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      networks: [auth-internal]
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 10s
+    timeout: 3s
+    retries: 10
+    networks: [auth-internal]
 
   postgresql:
     image: postgres:16-alpine
