@@ -1,7 +1,9 @@
 networks:
+  reverse-proxy:
+    driver: bridge
   edge:
     driver: bridge
-
+    
 services:
   traefik:
     image: traefik:v3.5
@@ -20,4 +22,24 @@ services:
     volumes:
       - ./templates/infra.tmpl.yml:/etc/traefik/infra.tmpl.yml:ro
     networks: [edge]
-    
+
+  caddy:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      BASE_DOMAIN: ${BASE_DOMAIN}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge, reverse-proxy]
+    depends_on:
+      - traefik
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}
