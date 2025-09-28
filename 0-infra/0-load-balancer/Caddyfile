@@ -4,3 +4,11 @@
         dns cloudflare {env.CLOUDFLARE_API_TOKEN}
     }
 }
+
+auth.{$BASE_DOMAIN} {
+	reverse_proxy authentik:9000
+
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}

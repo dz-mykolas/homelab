@@ -33,9 +33,6 @@ services:
     volumes:
       - authentik_media:/media
       - authentik_templates:/templates
-    ports:
-      - "9000:9000"
-      - "9443:9443"
     networks:
       - reverse-proxy
       - auth-internal
