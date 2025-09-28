@@ -13,7 +13,7 @@ http:
 tcp:
   routers:
     infra-https:
-      rule: HostSNIRegexp(^(.+\.)?{{ (env "BASE_DOMAIN") | replace "." "\\." }}$)
+      rule: HostSNIRegexp(`^(.+\.)?{{ (env "BASE_DOMAIN") | replace "." "\\." }}$`)
       entryPoints: [websecure]
       service: infra-https
       tls: { passthrough: true }
