@@ -1,7 +1,8 @@
 networks:
   reverse-proxy:
-    name: reverse-proxy
     driver: bridge
+  edge:
+    external: true
     
 services:
   caddy:
@@ -11,13 +12,13 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      MY_DOMAIN: ${MY_DOMAIN}
+      BASE_DOMAIN: ${BASE_DOMAIN}
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-    networks: [reverse-proxy]
+    networks: [edge, reverse-proxy]
 
 volumes:
   caddy_data: {}

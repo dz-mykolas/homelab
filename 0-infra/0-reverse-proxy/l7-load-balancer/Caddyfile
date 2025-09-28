@@ -1,4 +1,4 @@
-{$MY_DOMAIN} {
+{$BASE_DOMAIN} {
     respond "Hello, world!"
     tls {
         dns cloudflare {env.CLOUDFLARE_API_TOKEN}
