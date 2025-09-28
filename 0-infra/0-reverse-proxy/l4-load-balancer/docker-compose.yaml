@@ -1,0 +1,20 @@
+networks:
+  edge:
+    driver: bridge
+
+services:
+  traefik:
+    image: traefik:v3.5
+    restart: unless-stopped
+    command:
+      - --providers.file.directory=/etc/traefik/conf.d
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --log.level=INFO
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/edge-traefik/conf.d:/etc/traefik/conf.d:ro
+    networks: [edge]
