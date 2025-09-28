@@ -1,0 +1,25 @@
+http:
+  routers:
+    infra-http:
+      rule: Host(`{{ env "BASE_DOMAIN" }}`) || HostRegexp(`{sub:.+}.{{ env "BASE_DOMAIN" }}`)
+      entryPoints: [web]
+      service: infra-http
+  services:
+    infra-http:
+      loadBalancer:
+        servers:
+          - url: http://caddy-infra:80
+
+tcp:
+  routers:
+    infra-https:
+      rule: HostSNIRegexp(^(.+\.)?{{ (env "BASE_DOMAIN") | replace "." "\\." }}$)
+      entryPoints: [websecure]
+      service: infra-https
+      tls: { passthrough: true }
+      priority: 100
+  services:
+    infra-https:
+      loadBalancer:
+        servers:
+          - address: caddy-infra:443
