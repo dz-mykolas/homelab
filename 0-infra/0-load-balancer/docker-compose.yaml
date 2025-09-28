@@ -23,7 +23,7 @@ services:
       - ./templates/infra.tmpl.yml:/etc/traefik/infra.tmpl.yml:ro
     networks: [edge]
 
-  caddy:
+  caddy-nfra:
     build: .
     environment:
       BASE_DOMAIN: ${BASE_DOMAIN}
