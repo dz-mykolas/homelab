@@ -1,9 +1,9 @@
 networks:
   reverse-proxy:
-    driver: bridge
-  edge:
     external: true
-    
+  edge:
+    driver: bridge
+
 services:
   traefik:
     image: traefik:v3.5
