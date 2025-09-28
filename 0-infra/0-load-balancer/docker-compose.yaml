@@ -30,12 +30,12 @@ services:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - caddy_infra_data:/data
+      - caddy_infra_config:/config
     networks: [edge, reverse-proxy]
     depends_on:
       - traefik
 
 volumes:
-  caddy_data: {}
-  caddy_config: {}
+  caddy_infra_data: {}
+  caddy_infra_config: {}
