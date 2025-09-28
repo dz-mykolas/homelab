@@ -2,7 +2,7 @@ networks:
   reverse-proxy:
     driver: bridge
   edge:
-    driver: bridge
+    external: true
     
 services:
   traefik:
