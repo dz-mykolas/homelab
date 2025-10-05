@@ -1,5 +1,6 @@
 networks:
   reverse-proxy:
+    name: reverse-proxy
     external: true
   edge:
     driver: bridge
