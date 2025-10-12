@@ -1,8 +1,14 @@
+networks:
+  omada:
+    external: true
+
 services:
   omada:
     image: mbentley/omada-controller:latest
     container_name: omada
     restart: unless-stopped
+    networks:
+      - omada
     environment:
       TZ: ${TZ}
     volumes:

@@ -1,7 +1,12 @@
+networks:
+  omada:
+
 services:
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     restart: unless-stopped
+    networks:
+      - omada
     environment:
       TZ: Europe/Vilnius
     volumes:
