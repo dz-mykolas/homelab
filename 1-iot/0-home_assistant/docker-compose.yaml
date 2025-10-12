@@ -1,5 +1,5 @@
 networks:
-  omada:
+  omada_net:
     driver: bridge
 
 services:
@@ -7,11 +7,30 @@ services:
     image: ghcr.io/home-assistant/home-assistant:stable
     restart: unless-stopped
     networks:
-      - omada
+      - omada_net
     environment:
       TZ: Europe/Vilnius
     volumes:
       - ./config:/config
     ports:
       - "8123:8123"
+
+  omada:
+    image: mbentley/omada-controller:latest
+    container_name: omada
+    restart: unless-stopped
+    networks:
+      - omada_net
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ./data:/opt/tplink/EAPController/data
+      - ./logs:/opt/tplink/EAPController/logs
+      - ./work:/opt/tplink/EAPController/work
+    ports:
+      - "8043:8043"        # HTTPS UI
+      - "8088:8088"        # HTTP UI (optional)
+      - "8843:8843"        # guest portal (optional)
+      - "29810:29810/udp"  # discovery
+      - "29811-29816:29811-29816"  # adoption/management
   
