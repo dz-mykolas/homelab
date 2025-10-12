@@ -1,0 +1,14 @@
+services:
+  omada:
+    image: mbentley/omada-controller:latest
+    container_name: omada
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ./data:/opt/tplink/EAPController/data
+      - ./logs:/opt/tplink/EAPController/logs
+      - ./work:/opt/tplink/EAPController/work
+    ports:
+      - "127.0.0.1:8043:8043"      # HTTPS UI
+      - "127.0.0.1:8088:8088"      # HTTP UI
