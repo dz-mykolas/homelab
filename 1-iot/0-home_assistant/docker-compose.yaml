@@ -1,5 +1,6 @@
 networks:
   omada:
+    driver: bridge
 
 services:
   homeassistant:
