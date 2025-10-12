@@ -10,5 +10,5 @@ services:
       - ./logs:/opt/tplink/EAPController/logs
       - ./work:/opt/tplink/EAPController/work
     ports:
-      - "127.0.0.1:8043:8043"      # HTTPS UI
-      - "127.0.0.1:8088:8088"      # HTTP UI
+      - "8043:8043"      # HTTPS UI
+      - "8088:8088"      # HTTP UI
