@@ -1,10 +1,6 @@
 networks:
   reverse-proxy:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.69.4.0/24
-          gateway: 10.69.4.1
+    external: true
   edge:
     driver: bridge
 
