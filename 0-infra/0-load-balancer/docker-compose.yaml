@@ -3,8 +3,8 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.89.4.0/24
-          gateway: 10.89.4.1
+        - subnet: 10.69.4.0/24
+          gateway: 10.69.4.1
   edge:
     driver: bridge
 
@@ -38,7 +38,7 @@ services:
       - caddy_infra_config:/config
     networks:
       reverse-proxy:
-        ipv4_address: 10.89.4.12
+        ipv4_address: 10.69.4.12
       edge: {}
     depends_on:
       - traefik
