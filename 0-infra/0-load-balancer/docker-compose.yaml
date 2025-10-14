@@ -1,7 +1,10 @@
 networks:
   reverse-proxy:
-    name: reverse-proxy
-    external: true
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.89.4.0/24
+          gateway: 10.89.4.1
   edge:
     driver: bridge
 
@@ -33,7 +36,10 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_infra_data:/data
       - caddy_infra_config:/config
-    networks: [edge, reverse-proxy]
+    networks:
+      reverse-proxy:
+        ipv4_address: 10.89.4.12
+      edge: {}
     depends_on:
       - traefik
 
