@@ -1,26 +1,29 @@
 networks:
-  omada_net:
+  omada-net:
     driver: bridge
+  reverse-proxy:
+    external: true
 
 services:
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     restart: unless-stopped
     networks:
-      - omada_net
+      - omada-net
+      - reverse-proxy
     environment:
       TZ: Europe/Vilnius
     volumes:
       - ./config:/config
-    ports:
-      - "8123:8123"
+    # ports:
+    #   - "8123:8123"
 
   omada:
     image: mbentley/omada-controller:latest
     container_name: omada
     restart: unless-stopped
     networks:
-      - omada_net
+      - omada-net
     environment:
       TZ: ${TZ}
     volumes:

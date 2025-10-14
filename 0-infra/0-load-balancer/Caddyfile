@@ -20,3 +20,11 @@ komodo.{$BASE_DOMAIN} {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
+
+home.{$BASE_DOMAIN} {
+	reverse_proxy homeassistant:8123
+
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
