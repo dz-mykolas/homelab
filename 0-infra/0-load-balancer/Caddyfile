@@ -14,7 +14,7 @@ auth.{$BASE_DOMAIN} {
 }
 
 komodo.{$BASE_DOMAIN} {
-	reverse_proxy komodo-core-rp:9120
+	reverse_proxy komodo-core:9120
 
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
