@@ -50,17 +50,19 @@ services:
       - TS_LOGIN_SERVER=${HEADSCALE_SERVER_URL}
     volumes:
       - tailscale-state:/var/lib/tailscale
-    command: >
-      sh -c "
+    command:
+      - sh
+      - -c
+      - |
         tailscaled &
-        sleep 2 &&
-        tailscale up
-          --login-server $TS_LOGIN_SERVER
-          --accept-dns=false
-          --advertise-routes=172.30.0.0/24
-          --reset &&
+        sleep 2
+        tailscale up \
+          --login-server "$TS_LOGIN_SERVER" \
+          --accept-dns=false \
+          --advertise-routes=172.30.0.0/24 \
+          --snat-subnet-routes=true \
+          --reset
         tail -f /dev/null
-      "
     networks:
       tailnet:
         ipv4_address: 172.30.0.2
