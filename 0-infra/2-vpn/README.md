@@ -4,6 +4,7 @@ In Komodo add:
 
 ```bash
 HEADSCALE_SERVER_URL=https://vpn.example.com
+HEADSCALE_DNS_BASE_DOMAIN=tail.example.com
 TS_AUTHKEY=generated_in_next_step
 ```
 

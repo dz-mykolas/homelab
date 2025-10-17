@@ -15,6 +15,7 @@ prefixes:
 
 # DNS: you want override + sane global resolvers
 dns:
+  magic_dns: true
   override_local_dns: true
   nameservers:
     global:

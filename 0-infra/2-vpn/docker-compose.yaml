@@ -20,6 +20,8 @@ services:
     environment:
       - TZ=Europe/Vilnius
       - HEADSCALE_SERVER_URL=${HEADSCALE_SERVER_URL}
+      - HEADSCALE_DNS_BASE_DOMAIN=${HEADSCALE_DNS_BASE_DOMAIN}
+      - HEADSCALE_DNS_MAGIC_DNS=true
       # optional: HEADSCALE_LOG_LEVEL=info
     command: serve
     volumes:
