@@ -28,3 +28,11 @@ home.{$BASE_DOMAIN} {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
+
+vpn.{$BASE_DOMAIN} {
+	reverse_proxy headscale:8080
+
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}

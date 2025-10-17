@@ -1,0 +1,122 @@
+networks:
+  arr-net:
+    driver: bridge
+  reverse-proxy:
+    external: true
+  tailnet:
+    external: true
+
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vilnius
+    volumes:
+      - ./config/jellyfin:/config:Z
+      - ./cache/jellyfin:/cache:Z
+      - ./media:/data/media:Z
+    networks:
+      arr-net: {}
+      reverse-proxy: {} # Caddy → jellyfin:8096
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - TZ=Europe/Vilnius
+    volumes:
+      - ./config/jellyseerr:/app/config:Z
+    networks:
+      arr-net: {}
+      reverse-proxy: {} # Caddy → jellyseerr:5055
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment: [PUID=1000, PGID=1000, TZ=Europe/Vilnius]
+    volumes:
+      - ./config/prowlarr:/config:Z
+    networks:
+      arr-net: {}
+      tailnet:
+        ipv4_address: 172.30.0.13
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment: [PUID=1000, PGID=1000, TZ=Europe/Vilnius]
+    volumes:
+      - ./config/sonarr:/config:Z
+      - ./media:/data/media:Z
+      - ./downloads:/data/downloads:Z
+    networks:
+      arr-net: {}
+      tailnet:
+        ipv4_address: 172.30.0.11
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment: [PUID=1000, PGID=1000, TZ=Europe/Vilnius]
+    volumes:
+      - ./config/radarr:/config:Z
+      - ./media:/data/media:Z
+      - ./downloads:/data/downloads:Z
+    networks:
+      arr-net: {}
+      tailnet:
+        ipv4_address: 172.30.0.12
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vilnius
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./config/qbittorrent:/config:Z
+      - ./downloads:/data/downloads:Z
+    networks:
+      arr-net: {}
+      tailnet:
+        ipv4_address: 172.30.0.14
+    # (Optional for better P2P reachability, expose 6881 TCP/UDP on the host)
+    restart: unless-stopped
+
+  shoko:
+    image: ghcr.io/shokoanime/server:latest
+    container_name: shoko
+    environment: [PUID=1000, PGID=1000, TZ=Europe/Vilnius]
+    volumes:
+      - ./config/shoko:/home/shoko/.shoko:Z
+      - ./media/Anime:/mnt/anime:Z
+      - ./import:/mnt/import:Z
+    networks:
+      arr-net: {}
+      tailnet:
+        ipv4_address: 172.30.0.15
+    restart: unless-stopped
+
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    user: "1000:1000"
+    networks:
+      - arr-net
+      - tailnet
+    volumes:
+      - ./config/recyclarr:/config:Z
+    entrypoint: ["/bin/sh", "-c"]
+    command: "tail -f /dev/null" # run: podman exec recyclarr recyclarr sync
+    restart: unless-stopped

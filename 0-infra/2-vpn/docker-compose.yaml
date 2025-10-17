@@ -1,0 +1,64 @@
+networks:
+  reverse-proxy:
+    external: true
+  tailnet:
+    name: tailnet
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  headscale-data:
+  headscale-run:
+  tailscale-state:
+
+services:
+  headscale:
+    image: headscale/headscale:latest
+    container_name: headscale
+    environment:
+      - TZ=Europe/Vilnius
+      - HEADSCALE_SERVER_URL=${HEADSCALE_SERVER_URL}
+      - HEADSCALE_LISTEN_ADDR=0.0.0.0:8080
+      - HEADSCALE_METRICS_LISTEN_ADDR=0.0.0.0:9090
+      # optional: HEADSCALE_LOG_LEVEL=info
+    command: serve
+    volumes:
+      - headscale-data:/var/lib/headscale
+      - headscale-run:/var/run/headscale
+    networks:
+      - reverse-proxy
+    restart: unless-stopped
+
+  tailnet-router:
+    image: tailscale/tailscale:stable
+    container_name: tailnet-router
+    hostname: tailgw
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    sysctls:
+      net.ipv4.ip_forward: "1"
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_HOSTNAME=tailgw
+      - TS_LOGIN_SERVER=${HEADSCALE_SERVER_URL}
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+    command: >
+      sh -c "
+        tailscaled &
+        sleep 2 &&
+        tailscale up
+          --login-server $TS_LOGIN_SERVER
+          --accept-dns=false
+          --advertise-routes=172.30.0.0/24
+          --reset &&
+        tail -f /dev/null
+      "
+    networks:
+      tailnet:
+        ipv4_address: 172.30.0.2
+    restart: unless-stopped
