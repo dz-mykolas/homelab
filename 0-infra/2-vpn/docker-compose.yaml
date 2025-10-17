@@ -20,11 +20,10 @@ services:
     environment:
       - TZ=Europe/Vilnius
       - HEADSCALE_SERVER_URL=${HEADSCALE_SERVER_URL}
-      - HEADSCALE_LISTEN_ADDR=0.0.0.0:8080
-      - HEADSCALE_METRICS_LISTEN_ADDR=0.0.0.0:9090
       # optional: HEADSCALE_LOG_LEVEL=info
     command: serve
     volumes:
+      - ./headscale/config.yaml:/etc/headscale/config.yaml:Z
       - headscale-data:/var/lib/headscale
       - headscale-run:/var/run/headscale
     networks:
@@ -35,6 +34,8 @@ services:
     image: tailscale/tailscale:stable
     container_name: tailnet-router
     hostname: tailgw
+    depends_on:
+      - headscale
     cap_add:
       - NET_ADMIN
     devices:
