@@ -33,3 +33,9 @@ sqlite:
 log:
   level: info
   format: text
+
+derp:
+  urls:
+    - https://controlplane.tailscale.com/derpmap/default
+  auto_update_enabled: true
+  update_frequency: 24h
