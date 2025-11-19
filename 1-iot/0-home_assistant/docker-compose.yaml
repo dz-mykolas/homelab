@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     networks:
       - omada-net
+      - reverse-proxy
     environment:
       TZ: ${TZ}
     volumes:
