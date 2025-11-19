@@ -38,7 +38,7 @@ vpn.{$BASE_DOMAIN} {
 }
 
 omada.{$BASE_DOMAIN} {
-	reverse_proxy omada:8088
+	reverse_proxy omada:8043
 
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
